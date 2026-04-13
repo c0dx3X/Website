@@ -1,0 +1,212 @@
+:root{
+  --bg:#000;
+  --text:#f0ebe2;
+  --muted:#8b847d;
+  --accent:#d7b48a;
+  --line:rgba(255,255,255,.12);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 40% 38%, rgba(215,180,138,.04), transparent 22%),
+    linear-gradient(rgba(255,255,255,.01) 1px, transparent 1px);
+  background-size:auto,100% 3px;
+  opacity:.6;
+}
+
+.split-layout{
+  min-height:100vh;
+  width:min(100%, 1440px);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns: minmax(0, 1.05fr) 1px minmax(360px, .95fr);
+  position:relative;
+}
+.split-layout::before{
+  content:"";
+  position:absolute;
+  top:12px;
+  bottom:12px;
+  left:50%;
+  width:1px;
+  transform:translateX(-180px);
+  background:var(--line);
+}
+
+.left-pane,
+.right-pane{
+  min-width:0;
+}
+.left-pane{
+  display:grid;
+  place-items:center;
+  padding:32px 28px 32px 32px;
+}
+.left-inner{
+  width:min(100%, 620px);
+  display:grid;
+  gap:22px;
+  justify-items:center;
+  text-align:center;
+}
+.right-pane{
+  padding:32px 32px 32px 48px;
+}
+.right-inner{
+  width:min(100%, 520px);
+  display:grid;
+  gap:24px;
+}
+.section-label{
+  color:var(--text);
+  font-size:2rem;
+  line-height:1;
+  font-weight:700;
+  letter-spacing:-.03em;
+  justify-self:start;
+}
+.left-inner .section-label{
+  justify-self:center;
+  text-transform:lowercase;
+}
+.team-name{
+  margin:0;
+  font-size:clamp(2.6rem,5vw,4.6rem);
+  line-height:.95;
+  letter-spacing:-.06em;
+  font-weight:700;
+}
+
+.logo-stage{
+  position:relative;
+  width:min(100%, 560px);
+  height:420px;
+  display:grid;
+  place-items:center;
+}
+.logo-stage::before{
+  content:"";
+  position:absolute;
+  inset:12% 14%;
+  background:radial-gradient(circle at center, rgba(215,180,138,.08), rgba(215,180,138,.025) 40%, rgba(215,180,138,0) 72%);
+  filter:blur(34px);
+  opacity:.9;
+  pointer-events:none;
+}
+#logo-hitbox{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  cursor:grab;
+}
+#logo-hitbox:active{cursor:grabbing}
+#ascii-logo{
+  position:relative;
+  z-index:1;
+  margin:0;
+  white-space:pre;
+  font-family:var(--mono);
+  font-size:clamp(8px, .95vw, 14px);
+  line-height:.83;
+  letter-spacing:0;
+  color:var(--accent);
+  text-align:center;
+  user-select:none;
+  text-shadow:0 0 14px rgba(215,180,138,.08);
+  filter:drop-shadow(0 0 10px rgba(215,180,138,.05));
+  pointer-events:none;
+}
+
+.member-list{
+  display:grid;
+  gap:22px;
+}
+.member-card{
+  display:grid;
+  grid-template-columns:82px 1fr;
+  gap:16px;
+  align-items:center;
+}
+.member-avatar{
+  width:82px;
+  height:82px;
+  border-radius:50%;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+  background:#111;
+}
+.member-meta{
+  display:grid;
+  gap:3px;
+}
+.member-name{
+  font-size:2rem;
+  line-height:1;
+  font-weight:700;
+  letter-spacing:-.03em;
+}
+.member-handle{
+  color:var(--muted);
+  font-size:1rem;
+}
+.member-link{
+  margin-top:6px;
+  color:var(--text);
+  width:max-content;
+}
+.member-link:hover{opacity:.85}
+
+@media (max-width: 1100px){
+  .split-layout{
+    grid-template-columns:1fr;
+  }
+  .split-layout::before{display:none}
+  .left-pane{
+    padding:28px 24px 14px;
+  }
+  .right-pane{
+    padding:14px 24px 32px;
+  }
+  .right-inner{
+    width:min(100%, 720px);
+    margin:0 auto;
+  }
+  .section-label{
+    justify-self:center;
+  }
+}
+@media (max-width: 640px){
+  .logo-stage{
+    height:280px;
+  }
+  #ascii-logo{font-size:5px}
+  .member-card{
+    grid-template-columns:68px 1fr;
+    gap:14px;
+  }
+  .member-avatar{
+    width:68px;
+    height:68px;
+  }
+  .member-name{
+    font-size:1.5rem;
+  }
+}
