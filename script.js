@@ -18,7 +18,7 @@ const state = {
   pointerId: null,
   lastX: 0,
   lastY: 0,
-  chars: ' .,:;-=+*#%@'
+  chars: ' .`:^",;Il!i~+_-?][}{1)(|\\/*tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 };
 
 function addPoint(pts, x, y, z, g=1.0){ pts.push({x,y,z,g}); }
@@ -71,40 +71,94 @@ function addPolygonDiagram(pts, cx, cy, cz, r=0.28, n=10){
     addLine(pts, [cx, cy, cz+0.01], ring[i], 0.028, 0.9);
   }
 }
+function addCircuitStream(pts, start, end, z, amp=0.08, phase=0, weight=0.84){
+  const steps = 26;
+  for(let i=0;i<=steps;i++){
+    const t = i / steps;
+    const x = start[0] + (end[0] - start[0]) * t;
+    const y = start[1] + (end[1] - start[1]) * t + Math.sin((t * Math.PI * 4) + phase) * amp;
+    addPoint(pts, x, y, z + Math.cos((t * Math.PI * 3) + phase) * 0.02, weight);
+  }
+}
+function addHub(pts, cx, cy, cz, r=0.09){
+  const ring = [];
+  for(let i=0;i<8;i++){
+    const a = Math.PI * 2 * i / 8;
+    ring.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r, cz]);
+  }
+  addPolyline(pts, ring, 0.022, 1.16, true);
+  addLine(pts, [cx - r * 1.3, cy, cz], [cx + r * 1.3, cy, cz], 0.02, 0.9);
+  addLine(pts, [cx, cy - r * 1.3, cz], [cx, cy + r * 1.3, cz], 0.02, 0.9);
+}
+function addPageGrid(pts, x1, x2, y1, y2, z, cols=5, rows=5, weight=0.58){
+  for(let c=1;c<cols;c++){
+    const x = x1 + ((x2 - x1) * c / cols);
+    addLine(pts, [x, y1, z], [x, y2, z], 0.03, weight);
+  }
+  for(let r=1;r<rows;r++){
+    const y = y1 + ((y2 - y1) * r / rows);
+    addLine(pts, [x1, y, z], [x2, y, z], 0.03, weight);
+  }
+}
+function addSpineRibs(pts, x, y1, y2, z1, count=9, spread=0.05){
+  for(let i=0;i<count;i++){
+    const t = i / Math.max(1, count - 1);
+    const y = y1 + (y2 - y1) * t;
+    addLine(pts, [x - spread, y, z1 - 0.02], [x + spread, y, z1 + 0.02], 0.02, 0.88);
+  }
+}
+function addMarginNotes(pts, x, y1, y2, z, count=7){
+  for(let i=0;i<count;i++){
+    const y = y1 + ((y2 - y1) * i / Math.max(1, count - 1));
+    addDottedBar(pts, x - 0.12, x + 0.12, y, z, 0.05, 0.74);
+  }
+}
 
 function buildBookLogo() {
   const pts = [];
-  const L = [[-1.78, -0.92, -0.24], [-0.10, -1.06, 0.10], [-0.12, 0.98, 0.14], [-1.58, 1.18, -0.20]];
-  const R = [[0.10, -1.06, 0.10], [1.70, -0.90, -0.20], [1.50, 1.04, -0.26], [0.12, 0.98, 0.14]];
+  const L = [[-1.98, -1.08, -0.28], [-0.10, -1.24, 0.14], [-0.12, 1.16, 0.18], [-1.78, 1.38, -0.24]];
+  const R = [[0.10, -1.24, 0.14], [1.90, -1.04, -0.24], [1.70, 1.18, -0.30], [0.12, 1.16, 0.18]];
   addPolyline(pts, L, 0.02, 1.38, true);
   addPolyline(pts, R, 0.02, 1.38, true);
-  addLine(pts, [-0.05, -1.06, 0.10], [0.02, 0.98, 0.15], 0.02, 1.34);
-  addLine(pts, [0.05, -1.04, 0.02], [0.10, 0.96, 0.08], 0.022, 1.0);
+  addLine(pts, [-0.06, -1.24, 0.12], [0.02, 1.16, 0.18], 0.018, 1.42);
+  addLine(pts, [0.06, -1.20, 0.03], [0.10, 1.12, 0.10], 0.02, 1.06);
+  for(let i=0;i<13;i++){
+    const dz = -0.04 - i * 0.038;
+    addLine(pts, [-2.00, 1.36, dz], [0.00, 1.12, 0.10 + dz*0.1], 0.026, 0.84);
+    addLine(pts, [0.04, 1.12, 0.10 + dz*0.1], [1.74, 1.16, dz], 0.026, 0.84);
+  }
   for(let i=0;i<10;i++){
-    const dz = -0.04 - i * 0.036;
-    addLine(pts, [-1.80, 1.16, dz], [0.00, 0.96, 0.08 + dz*0.1], 0.028, 0.84);
-    addLine(pts, [0.04, 0.96, 0.08 + dz*0.1], [1.54, 1.02, dz], 0.028, 0.84);
+    const dx = 1.70 + i * 0.05;
+    addLine(pts, [dx, 1.12, -0.18 - i*0.02], [dx + 0.024, -1.02, -0.22 - i*0.02], 0.028, 0.9);
   }
-  for(let i=0;i<8;i++){
-    const dx = 1.54 + i * 0.045;
-    addLine(pts, [dx, 1.00, -0.15 - i*0.02], [dx + 0.022, -0.90, -0.19 - i*0.02], 0.03, 0.9);
-  }
-  addPageText(pts, -1.58, -0.26, -0.78, 0.80, 0.02, 14);
-  addPageText(pts, -0.92, -0.36, -0.08, 0.36, 0.03, 7);
-  addPageText(pts, 0.24, 0.98, -0.64, 0.76, 0.04, 12);
-  addPageText(pts, 0.22, 0.70, -0.86, -0.50, 0.04, 5);
-  for(let i=0;i<8;i++) addDottedBar(pts, -0.94, -0.34, -0.18 + i*0.09, 0.03 + i*0.002, 0.09, 0.92);
-  addDiagramCluster(pts, -0.36, -0.68, 0.08, 0.30);
-  addPolygonDiagram(pts, 1.04, -0.64, 0.02, 0.30, 10);
-  addDiagramCluster(pts, 0.96, -0.02, 0.05, 0.26);
-  addDiagramCluster(pts, 0.90, 0.38, 0.06, 0.22);
-  addDiagramCluster(pts, 0.84, 0.76, 0.05, 0.19);
-  for(let i=0;i<5;i++) addDottedBar(pts, 1.18, 1.38, -0.78 + i*0.32, 0.02, 0.11, 0.8);
-  addLine(pts, [1.72, 0.44, -0.18], [2.06, 0.46, -0.08], 0.024, 1.02);
-  addLine(pts, [2.06, 0.46, -0.08], [2.10, 0.18, -0.04], 0.028, 1.02);
-  addLine(pts, [2.10, 0.18, -0.04], [1.94, 0.06, -0.10], 0.028, 0.96);
-  addLine(pts, [1.94, 0.06, -0.10], [1.88, 0.30, -0.14], 0.028, 0.96);
-  addLine(pts, [1.88, 0.30, -0.14], [2.06, 0.46, -0.08], 0.028, 0.84);
+  addPageText(pts, -1.74, -0.28, -0.94, 0.96, 0.03, 18);
+  addPageText(pts, -1.02, -0.34, -0.12, 0.44, 0.05, 8);
+  addPageGrid(pts, -1.48, -0.50, -0.86, 0.72, 0.04, 4, 6, 0.54);
+  addMarginNotes(pts, -0.52, -0.76, 0.68, 0.06, 8);
+  addPageText(pts, 0.26, 1.16, -0.82, 0.90, 0.05, 16);
+  addPageText(pts, 0.22, 0.74, -1.02, -0.56, 0.05, 6);
+  addPageGrid(pts, 0.40, 1.20, -0.74, 0.70, 0.05, 5, 6, 0.52);
+  for(let i=0;i<9;i++) addDottedBar(pts, -1.04, -0.30, -0.24 + i*0.11, 0.04 + i*0.002, 0.08, 0.94);
+  addDiagramCluster(pts, -0.40, -0.82, 0.10, 0.34);
+  addPolygonDiagram(pts, 1.18, -0.74, 0.02, 0.34, 10);
+  addDiagramCluster(pts, 1.08, -0.06, 0.06, 0.30);
+  addDiagramCluster(pts, 1.00, 0.42, 0.06, 0.24);
+  addDiagramCluster(pts, 0.92, 0.88, 0.05, 0.20);
+  addCircuitStream(pts, [0.24, 0.96], [1.48, 0.92], 0.06, 0.036, 0.2, 0.78);
+  addCircuitStream(pts, [0.22, 0.52], [1.52, 0.44], 0.05, 0.046, 1.1, 0.80);
+  addCircuitStream(pts, [0.20, 0.08], [1.46, -0.10], 0.04, 0.038, 2.0, 0.78);
+  addCircuitStream(pts, [0.22, -0.38], [1.40, -0.58], 0.03, 0.032, 0.6, 0.74);
+  addHub(pts, 1.62, 0.92, 0.04, 0.09);
+  addHub(pts, 1.64, 0.46, 0.03, 0.09);
+  addHub(pts, 1.56, -0.06, 0.03, 0.085);
+  addHub(pts, 1.48, -0.58, 0.02, 0.08);
+  addSpineRibs(pts, 0.02, -1.10, 1.06, 0.16, 11, 0.08);
+  for(let i=0;i<6;i++) addDottedBar(pts, 1.30, 1.56, -0.90 + i*0.38, 0.03, 0.11, 0.82);
+  addLine(pts, [1.92, 0.54, -0.20], [2.30, 0.56, -0.08], 0.022, 1.04);
+  addLine(pts, [2.30, 0.56, -0.08], [2.34, 0.24, -0.04], 0.026, 1.04);
+  addLine(pts, [2.34, 0.24, -0.04], [2.16, 0.10, -0.11], 0.026, 0.98);
+  addLine(pts, [2.16, 0.10, -0.11], [2.10, 0.38, -0.15], 0.026, 0.98);
+  addLine(pts, [2.10, 0.38, -0.15], [2.30, 0.56, -0.08], 0.026, 0.86);
   state.points = pts;
 }
 
@@ -139,7 +193,7 @@ function draw() {
   const ax = state.rotX + state.dragY;
   const ay = state.rotY + state.dragX;
   const az = state.rotZ;
-  const scale = Math.min(w, h) * 0.48;
+  const scale = Math.min(w, h) * 0.52;
   const cam = 8.7;
 
   for (const p of state.points) {
@@ -148,7 +202,7 @@ function draw() {
     const px = Math.floor(w * 0.5 + q.x * scale * depth * 3.0);
     const py = Math.floor(h * 0.5 + q.y * scale * depth * 1.86);
     if (px < 0 || px >= w || py < 0 || py >= h) continue;
-    const lum = Math.max(0, Math.min(1, ((q.z + 3.0) / 6.5) * p.g));
+    const lum = Math.max(0, Math.min(1, (0.32 + ((q.z + 3.0) / 6.5) * 0.68) * p.g));
     const idx = Math.min(state.chars.length - 1, Math.floor(lum * (state.chars.length - 1)));
     if (depth > zbuf[py][px]) {
       zbuf[py][px] = depth;
